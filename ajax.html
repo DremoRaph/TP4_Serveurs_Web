@@ -1,0 +1,242 @@
+
+<html>
+<head>
+    <meta charset="utf-8">
+    <style>
+        table, th, td 
+        {
+            border: 1px solid black;
+            border-collapse: collapse;
+        }
+                    
+        td
+        {
+            padding: 15px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div>
+        <button type="button" id="test-button" onclick="loadEleves()">GET pour afficher le tableau d'eleves!</button>
+        <button type="button" id="test-button" onclick="loadVehicules()">GET pour afficher le tableau de vehicules!</button>
+    </div>
+    <table id="tableau" style="display:none; ">
+    <tr><th>ID</th><th id = "champ-1"></th><th id = "champ-2"></th><th id = "champ-3"></th><th id = "champ-4"></th><th id = "champ-5"></th></tr>
+    </table>
+    <div id="contenu-page">
+
+    </div>
+    <div>
+        <h2>Ajouter un nouvel élève</h2>
+        <form>
+        Prénom de l'élève: <input type="text" id="prenom_eleve"><br> 
+        Nom de l'élève: <input type="text" id="nom_eleve"><br> 
+        Âge de l'élève: <input type="text" id="age_eleve"><br>
+        Hauteur de l'élève: <input type="text" id="hauteur_eleve"><br> 
+        Programme de l'élève: <input type="text" id="programme_eleve"><br> 
+        <button onclick="envoyerEleve()">Ajouter Eleve</button><br></form></div>
+    <div>
+        <h2>Ajouter un nouveau véhicule</h2>
+        <form>
+        Fabricant du véhicule: <input type="text" id="fabricant_vehicule"><br> 
+        Modèle du véhicule: <input type="text" id="modele_vehicule"><br> 
+        Couleur du véhicule: <input type="text" id="couleur_vehicule"><br>
+        Droits de parking du véhicule: <input type="text" id="parking_vehicule"><br> 
+        Id du proprio du véhicule <input type="text" id="id_proprio_vehicule"><br> 
+        <button onclick="envoyerVehicule()">Ajouter Vehicule</button><br></form>
+    </div>
+    <script>
+        function envoyerEleve(){
+            var xhttp = new XMLHttpRequest();
+            
+            var page = this.page;
+            var prenom = document.getElementById("prenom_eleve").value;
+            var nom = document.getElementById("nom_eleve").value;
+            var age = document.getElementById("age_eleve").value;
+            var hauteur = document.getElementById("hauteur_eleve").value;
+            var programme = document.getElementById("programme_eleve").value;
+            var contenu = document.getElementById("contenu-page");
+            var params = "prenom=" + prenom + "&nom=" + nom + "&age=" + age + "&hauteur=" + hauteur + "&programme=" + programme;
+            
+            xhttp.onreadystatechange = function() {//Call a function when the state changes.
+                if(this.readyState == 4 && this.status == 200) {
+                    contenu.innerHTML = this.response;
+                    console.log(this.responseText);
+                }
+            }
+            xhttp.open("POST", "ajouter_eleve.php", true);
+
+            xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+    
+            xhttp.send(params);
+            
+        }
+        function envoyerVehicule(){
+            var xhttp = new XMLHttpRequest();
+            
+            var page = this.page;
+            var fabricant = document.getElementById("fabricant_vehicule").value;
+            var modele = document.getElementById("modele_vehicule").value;
+            var couleur = document.getElementById("couleur_vehicule").value;
+            var parking = document.getElementById("parking_vehicule").value;
+            var proprietaire = document.getElementById("id_proprio_vehicule").value;
+            var contenu = document.getElementById("contenu-page");
+            var params = "fabricant=" + fabricant + "&modele=" + modele + "&couleur=" + couleur + "&parking=" + parking + "&proprietaire=" + proprietaire;
+            
+            xhttp.onreadystatechange = function() {//Call a function when the state changes.
+                if(this.readyState == 4 && this.status == 200) {
+                    contenu.innerHTML = this.response;
+                    console.log(this.responseText);
+                }
+            }
+            xhttp.open("POST", "ajouter_vehicule.php", true);
+
+            xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+    
+            xhttp.send(params);
+        }
+
+        function loadEleves() {
+        var xhttp = new XMLHttpRequest();
+        var page = this.page;
+        var tableau = document.getElementById("tableau");
+        var reponse = null;
+        xhttp.onreadystatechange = function() {
+            if (this.readyState == 4 && this.status == 200) {
+                reponse = new Array();
+                var listeObjets = this.response.split("/");
+                listeObjets.splice(-1,1);
+                //console.log(listeObjets);
+                for(i = 0; i < listeObjets.length; i++)
+                {
+                    var objet = JSON.parse(listeObjets[i]);
+                    reponse.push(objet);
+                }
+                //console.log(reponse[2].age);
+                //reponse.push(JSON.parse(listeObjets[0]));
+                //console.log(reponse[0].id + reponse[0]);
+                //console.log(reponse[0]);
+                //document.getElementById("contenu-page").innerHTML = this.responseText;
+                var ranges = document.getElementsByClassName("extra-range");
+                if(ranges != null)
+                {
+                    while(ranges[0])
+                    {
+                        ranges[0].parentNode.removeChild(ranges[0]);
+                    }
+                }
+                var champ1 = document.getElementById("champ-1");
+                champ1.innerHTML = "Prenom";
+                var champ2 = document.getElementById("champ-2");
+                champ2.innerHTML = "Nom";
+                var champ3 = document.getElementById("champ-3");
+                champ3.innerHTML = "Age";
+                var champ4 = document.getElementById("champ-4");
+                champ4.innerHTML = "Taille (cm)";
+                var champ5 = document.getElementById("champ-5");
+                champ5.innerHTML = "Technique";
+                for(i = 0; i < reponse.length; i++)
+                {
+
+                    var range = tableau.insertRow(i + 1);
+                    range.className = "extra-range"; 
+                    var id = range.insertCell(0);
+                    id.innerHTML = reponse[i].id;
+                    var prenom = range.insertCell(1);
+                    prenom.innerHTML = reponse[i].prenom;
+                    var nom = range.insertCell(2);
+                    nom.innerHTML = reponse[i].nom;
+                    var age = range.insertCell(3);
+                    age.innerHTML = reponse[i].age;
+                    var hauteur = range.insertCell(4);
+                    hauteur.innerHTML = reponse[i].hauteur;
+                    var programme = range.insertCell(5)
+                    programme.innerHTML = reponse[i].programme;
+                }
+            
+            
+            }
+            tableau.style.display = "inline-block"; 
+            
+
+        };
+        xhttp.open("GET", "select_eleve.php", true);
+        xhttp.send();
+        }
+    </script>
+    <script>
+        function loadVehicules() {
+        var xhttp = new XMLHttpRequest();
+        var page = this.page;
+        var tableau = document.getElementById("tableau");
+        var reponse = null;
+        xhttp.onreadystatechange = function() {
+            if (this.readyState == 4 && this.status == 200) {
+                reponse = new Array();
+                var listeObjets = this.response.split("/");
+                listeObjets.splice(-1,1);
+                //console.log(listeObjets);
+                for(i = 0; i < listeObjets.length; i++)
+                {
+                    var objet = JSON.parse(listeObjets[i]);
+                    reponse.push(objet);
+                }
+                //console.log(reponse[2].age);
+                //reponse.push(JSON.parse(listeObjets[0]));
+                //console.log(reponse[0].id + reponse[0]);
+                //console.log(reponse[0]);
+                //document.getElementById("contenu-page").innerHTML = this.responseText;
+                var ranges = document.getElementsByClassName("extra-range");
+                if(ranges != null)
+                {
+                    while(ranges[0])
+                    {
+                        ranges[0].parentNode.removeChild(ranges[0]);
+                    }
+                }
+                var champ1 = document.getElementById("champ-1");
+                champ1.innerHTML = "Fabricant";
+                var champ2 = document.getElementById("champ-2");
+                champ2.innerHTML = "Modèle";
+                var champ3 = document.getElementById("champ-3");
+                champ3.innerHTML = "Couleur";
+                var champ4 = document.getElementById("champ-4");
+                champ4.innerHTML = "Droits de Parking";
+                var champ5 = document.getElementById("champ-5");
+                champ5.innerHTML = "Proprietaire";
+                for(i = 0; i < reponse.length; i++)
+                {
+
+                    var range = tableau.insertRow(i + 1);
+                    range.className = "extra-range"; 
+                    var id = range.insertCell(0);
+                    id.innerHTML = reponse[i].id;
+                    var fabricant = range.insertCell(1);
+                    fabricant.innerHTML = reponse[i].fabricant;
+                    var nom_modele = range.insertCell(2);
+                    nom_modele.innerHTML = reponse[i].nom_modele;
+                    var couleur = range.insertCell(3);
+                    couleur.innerHTML = reponse[i].couleur;
+                    var droits_parking = range.insertCell(4);
+                    droits_parking.innerHTML = reponse[i].droits_parking;
+                    var proprietaire_eleveid = range.insertCell(5)
+                    proprietaire_eleveid.innerHTML = reponse[i].proprietaire_eleveid;
+                }
+            
+            
+            }
+            tableau.style.display = "inline-block"; 
+            
+
+        };
+        xhttp.open("GET", "select_vehicule.php", true);
+        xhttp.send();
+        }
+    </script>
+</body>
+
+</html>
+
+
+
